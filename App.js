@@ -18,7 +18,7 @@ export default function App() {
       lottos.push(i);
     }
 
-    for(i=0; i<=44; i++){
+    for(i=0; i<=45; i++){
       rnumber = Math.floor(Math.random()*45);
 
       a = lottos[i];
