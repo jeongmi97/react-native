@@ -1,62 +1,55 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { PickerIOSComponent, StyleSheet, Text, View , Button} from 'react-native';
+import { PickerIOSComponent, StyleSheet, Text, View , SafeAreaView, Button, TextInput } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
 
-  const [lotto, setLotto] = useState([]);
+  const [txt, setTxt] = useState('입력해주세요.');
 
-  function makeLotto(){
-    let i=0;
-    let lnumber = [];
-    let rnumber = 0;
+  useEffect(() => {
+    loadData();
+  }, []);
 
-    let lottos = [];
-    let a = 0;
-
-    for(i=1; i<=45; i++){
-      lottos.push(i);
+  const saveData = async (value) => {
+    try {
+      await AsyncStorage.setItem('assa', value)
+    } catch (e) {
+      // saving error
     }
-
-    for(i=0; i<=45; i++){
-      rnumber = Math.floor(Math.random()*45);
-
-      a = lottos[i];
-      lottos[i] = lottos[rnumber];
-      lottos[rnumber] = a;
-
-    }
-
-    console.log(lottos);
-
-    for(i=0; i<6; i++){
-      lnumber.push(lottos[i]);
-    }
-    setLotto(lnumber);
   }
 
-  useEffect(() => { // 처음 한번만 렌더링 됨
-    makeLotto();
-  },[]);
-
-  
+  const loadData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('assa')
+      if(value !== null) {
+        setTxt(value);
+      }
+    } catch(e) {
+      // error reading value
+    }
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={{marginBottom: 100, }}>lotto</Text>
-      <Button title="생성" onPress={()=>makeLotto()}/>
-      <Text>{lotto.toLocaleString()}</Text>
-      <StatusBar style="auto" />
-    </View>
+    <View style={{flex:1, backgroundColor:'#fc0', }}>
+      <SafeAreaView style={{flex:1, }}>
+        <StatusBar style="auto" />
+        <View style={{padding:10, flexDirection:'row', alignItems:'center', justifyContent:'space-between', }}>
+          <Button title="저장" onPress={() => saveData(txt)}></Button>
+          <Text style={{fontSize:18, }}>메모장</Text>
+          <Button title="불러오기" onPress={() => loadData()}></Button>
+        </View>
+
+        <View style={{backgroundColor:'#eeeeee', flex:1, padding:10, }}>
+          <TextInput value={txt} 
+          onChangeText={txt => setTxt(txt)}
+          multiline />
+        </View>
+      </SafeAreaView>
+  </View>
+  
   );
+
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  
-});
+
